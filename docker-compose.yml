@@ -1,17 +1,21 @@
 version: "3.7"
 services:
         airflow:
-                build: ./airflow
+                build: 
+                        context: ./airflow
+                        args:
+                                AIRFLOW_HOME: ${AIRFLOW_HOME}
+                                AIRFLOW__CORE__SQL_ALCHEMY_CON: ${AIRFLOW_SQLITE_STR}
+
                 image: airflow:local
                 volumes:
-                        - logs-data:/airflow/logs
-                        - sqlite-data:/airflow/data
+                        - logs-data:${AIRFLOW_LOGS_LOCATION}
+                        - sqlite-data:${AIRFLOW_SQLITE_LOCATION}
                 ports:
-                        - "8080:8080"
-
+                        - ${AIRFLOW_WEB_PORT}:${AIRFLOW_WEB_PORT}
                 expose:
-                        - "8080"
-
+                        - ${AIRFLOW_WEB_PORT}
+                
 
 volumes:
         sqlite-data:
