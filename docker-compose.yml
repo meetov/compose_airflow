@@ -1,9 +1,18 @@
-version: "2"
+version: "3.7"
 services:
         airflow:
                 build: ./airflow
-                command: ["airflow", "webserver", "--port", "8080"]
+                image: airflow:local
+                volumes:
+                        - logs-data:/airflow/logs
+                        - sqlite-data:/airflow/data
                 ports:
                         - "8080:8080"
 
+                expose:
+                        - "8080"
 
+
+volumes:
+        sqlite-data:
+        logs-data:

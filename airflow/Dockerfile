@@ -1,19 +1,19 @@
 FROM python:3.6.8-slim-stretch
 
-ARG PORT=8080
-
-WORKDIR /airflow/
-
-COPY airflow.cfg .
-COPY dags/ .
+WORKDIR /airflow
 
 RUN apt -y update && \
 	apt -y install build-essential
 
-RUN export AIRFLOW_HOME=/airflow/ && pip install apache-airflow
+RUN pip install -r requirements.txt
 
-EXPOSE $PORT
+ADD airflow.cfg .
+ADD requirements.txt .
+ADD dags .
+ADD airflow_init.sh .
 
-RUN airflow initdb
+ENV AIRFLOW_HOME /airflow
 
-RUN apt purge -y --auto-remove build-essential
+RUN apt purge -y --auto-remove build-essential && rm requirements.txt
+
+CMD ["/airflow/airflow_init.sh"]
