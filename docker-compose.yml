@@ -5,7 +5,7 @@ services:
                         context: ./airflow
                         args:
                                 AIRFLOW_HOME: ${AIRFLOW_HOME}
-                                AIRFLOW__CORE__SQL_ALCHEMY_CON: ${AIRFLOW_SQLITE_STR}
+                                AIRFLOW__CORE__SQL_ALCHEMY_CON: ${AIRFLOW_SQLALCH_STR}
 
                 image: airflow:local
                 volumes:
