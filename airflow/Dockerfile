@@ -1,20 +1,18 @@
-FROM python:3.6.8-slim-stretch
+FROM debian:stretch-slim
 
-RUN apt -y update && \
-	apt -y install build-essential
+RUN apt -yqq update && apt -yqq install python3 \
+                                            python3-pip \
+                                            python3-dev \
+                                            default-libmysqlclient-dev
 
-ARG AIRFLOW_HOME
-ARG AIRFLOW__CORE__SQL_ALCHEMY_CON
+WORKDIR /airflow
 
-ENV AIRFLOW__CORE__SQL_ALCHEMY_CON=$AIRFLOW__CORE__SQL_ALCHEMY_CON
-
-WORKDIR $AIRFLOW_HOME
+ENV AIRFLOW_HOME=/airflow
 
 ADD requirements.txt .
 ADD airflow_init.sh .
+ADD airflow.cfg .
 
-RUN pip install -r requirements.txt
-
-RUN apt purge -y --auto-remove build-essential && rm requirements.txt
+RUN pip3 install -r requirements.txt
 
 CMD ["./airflow_init.sh"]
