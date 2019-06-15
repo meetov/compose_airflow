@@ -1,22 +1,41 @@
 version: "3.7"
 services:
-        airflow:
-                build: 
-                        context: ./airflow
-                        args:
-                                AIRFLOW_HOME: ${AIRFLOW_HOME}
-                                AIRFLOW__CORE__SQL_ALCHEMY_CON: ${AIRFLOW_SQLALCH_STR}
+  airflow:
+    build:
+      context: ./airflow
+      args:
+        AIRFLOW_HOME: ${AIRFLOW_HOME}
 
-                image: airflow:local
-                volumes:
-                        - logs-data:${AIRFLOW_LOGS_LOCATION}
-                        - sqlite-data:${AIRFLOW_SQLITE_LOCATION}
-                ports:
-                        - ${AIRFLOW_WEB_PORT}:${AIRFLOW_WEB_PORT}
-                expose:
-                        - ${AIRFLOW_WEB_PORT}
-                
+    image: airflow:local
+    volumes:
+      - airflow-logs:${AIRFLOW_LOGS_PATH}
+    ports:
+      - ${AIRFLOW_WEB_PORT}:${AIRFLOW_WEB_PORT}
+    expose:
+      - ${AIRFLOW_WEB_PORT}
+    depends_on:
+      - airflow-db
+    links:
+      - airflow-db:airflow-db
 
+  airflow-db:
+    image: mysql:5.7.26
+    environment:
+      MYSQL_ROOT_PASSWORD: root_passwd
+      MYSQL_DATABASE: airflow_db
+      MYSQL_USER: airflow_user
+      MYSQL_PASSWORD: airflow_password
+    command: --explicit_defaults_for_timestamp=1 --pid-file=/var/run/mysqld/mysqld
+    volumes:
+      - airflow-db:${AIRFLOW_DATABASE_PATH}
+    ports:
+      - ${AIRFLOW_DATABASE_PORT}:${AIRFLOW_DATABASE_PORT}
+    expose:
+      - ${AIRFLOW_DATABASE_PORT}
+
+    restart: always
 volumes:
-        sqlite-data:
-        logs-data:
+  airflow-db:
+    driver: local
+  airflow-logs:
+    driver: local
